@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Binario - Dirección IP</title>
+    <style>
+        /* Reset and general body styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            padding: 20px;
+            overflow-x: hidden; /* Allow vertical scroll if content overflows */
+        }
+
+        /* Game container */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        /* Instruction text */
+        .instruction {
+            font-size: 16px;
+            color: #888888;
+            text-align: center;
+            margin-bottom: 15px;
+            max-width: 800px;
+        }
+
+        /* IP Container to hold all octets */
+        .ip-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* Container for each octet */
+        .octet-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background-color: #1a1a1a;
+            min-width: 280px; /* Adjusted min-width */
+        }
+        
+        .octet-title {
+            font-size: 18px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        /* Bits container */
+        .bits-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow bits to wrap if not enough space */
+        }
+
+        /* Bit styles */
+        .bit-wrapper { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin-bottom: 25px; 
+        }
+        .bit {
+            width: 50px; 
+            height: 50px;
+            border-radius: 50%;
+            background-color: #666666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+            border: none; outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* Added for .bit-label positioning */
+        }
+        .bit:hover { transform: scale(1.05); }
+        .bit:active { transform: scale(0.95); }
+        .bit.on {
+            background-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        .bit.on:hover { background-color: #FFED4E; }
+
+        .bit-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333333;
+            transition: all 0.3s ease;
+        }
+        .bit.on .bit-value { color: #1a1a1a; }
+
+        .bit-label {
+            position: absolute;
+            bottom: -20px; 
+            font-size: 12px;
+            font-weight: bold;
+            color: #FFD700;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .bit.on .bit-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Result container and IP display */
+        .result-container {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #333;
+            min-width: 280px;
+        }
+        .ip-display-label {
+            font-size: 16px;
+            color: #CCCCCC;
+            margin-bottom: 5px;
+        }
+        .ip-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            word-break: break-all; /* Ensure IP doesn't overflow container */
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) { /* Wider breakpoint for 4 octets side-by-side */
+            .ip-container {
+                /* flex-direction: column; Stack if needed, but try to keep side-by-side longer */
+                /* align-items: center; */
+            }
+            .octet-container {
+                 min-width: 260px; /* Slightly smaller min-width */
+            }
+        }
+        @media (max-width: 768px) {
+            .ip-container {
+                flex-direction: column; /* Stack octets vertically */
+                align-items: center;
+            }
+            .octet-container {
+                width: 90%; 
+                max-width: 450px;
+                min-width: unset;
+            }
+            .bit { width: 40px; height: 40px; }
+            .bit-value { font-size: 18px; }
+            .bit-label { font-size: 10px; bottom: -18px; }
+            .bits-container { gap: 8px; }
+            .ip-display { font-size: 22px; }
+            .octet-title { font-size: 16px; }
+            .instruction { font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            .bit { width: 35px; height: 35px; }
+            .bit-value { font-size: 16px; }
+            .bits-container { gap: 5px; }
+            .bit-wrapper { margin-bottom: 20px; }
+            .octet-container { padding: 10px; }
+             .result-container {
+                width: 90%;
+                max-width: 450px;
+            }
+        }
+        @media (hover: none) and (pointer: coarse) {
+            .bit:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="instruction">
+            Toca los círculos para cambiar los bits de cada octeto. Los valores posicionales aparecen cuando el bit está encendido.
+            La dirección IP resultante se muestra abajo.
+        </div>
+
+        <div class="ip-container">
+            <!-- Octets will be generated by JavaScript -->
+        </div>
+
+        <div class="result-container">
+            <div class="ip-display-label">Dirección IP Resultante:</div>
+            <div class="ip-display">0.0.0.0</div>
+        </div>
+    </div>
+
+    <script>
+        const ipContainer = document.querySelector('.ip-container');
+        const ipDisplayElement = document.querySelector('.ip-display');
+        const numOctets = 4;
+        const bitsPerOctet = 8;
+        const octetValues = [128, 64, 32, 16, 8, 4, 2, 1];
+
+        let octetsState = Array(numOctets).fill(null).map(() => Array(bitsPerOctet).fill(0));
+
+        function createOctetHTML(octetIndex) {
+            const octetDiv = document.createElement('div');
+            octetDiv.classList.add('octet-container');
+            
+            const title = document.createElement('h3');
+            title.classList.add('octet-title');
+            title.textContent = `Octeto ${octetIndex + 1}`;
+            octetDiv.appendChild(title);
+
+            const bitsDiv = document.createElement('div');
+            bitsDiv.classList.add('bits-container');
+
+            for (let i = 0; i < bitsPerOctet; i++) {
+                const bitWrapper = document.createElement('div');
+                bitWrapper.classList.add('bit-wrapper');
+
+                const bitElement = document.createElement('div');
+                bitElement.classList.add('bit');
+                bitElement.dataset.octet = octetIndex;
+                bitElement.dataset.position = i; 
+
+                const bitValueSpan = document.createElement('span');
+                bitValueSpan.classList.add('bit-value');
+                bitValueSpan.textContent = '0';
+                bitElement.appendChild(bitValueSpan);
+
+                const bitLabelSpan = document.createElement('span');
+                bitLabelSpan.classList.add('bit-label');
+                bitLabelSpan.textContent = octetValues[i];
+                
+                bitElement.appendChild(bitLabelSpan); // Make label a child of bit
+                bitWrapper.appendChild(bitElement);
+                bitsDiv.appendChild(bitWrapper);
+
+                const handleToggle = () => {
+                    toggleBit(bitElement, octetIndex, i);
+                };
+                bitElement.addEventListener('click', handleToggle);
+                bitElement.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); 
+                    handleToggle();
+                }, { passive: false });
+            }
+            octetDiv.appendChild(bitsDiv);
+            return octetDiv;
+        }
+
+        function toggleBit(bitElement, octetIndex, bitPosition) {
+            octetsState[octetIndex][bitPosition] = octetsState[octetIndex][bitPosition] === 0 ? 1 : 0;
+            bitElement.classList.toggle('on');
+            bitElement.querySelector('.bit-value').textContent = octetsState[octetIndex][bitPosition];
+            updateIpDisplay();
+        }
+
+        function updateIpDisplay() {
+            const ipParts = octetsState.map(octet => {
+                let decimalValue = 0;
+                for (let i = 0; i < bitsPerOctet; i++) {
+                    if (octet[i] === 1) {
+                        decimalValue += octetValues[i];
+                    }
+                }
+                return decimalValue;
+            });
+            ipDisplayElement.textContent = ipParts.join('.');
+        }
+
+        for (let i = 0; i < numOctets; i++) {
+            ipContainer.appendChild(createOctetHTML(i));
+        }
+
+        updateIpDisplay();
+    </script>
+</body>
+</html>

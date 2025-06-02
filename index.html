@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Binario - 8 Bits</title>
+    <style>
+        /* Reset de márgenes y paddings, y box-sizing */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Estilos generales del cuerpo */
+        body {
+            background-color: #000000; /* Fondo negro */
+            height: 100vh; /* Altura completa de la ventana */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif; /* Fuente principal */
+            overflow: hidden; /* Evita el scroll */
+            touch-action: manipulation; /* Mejora la respuesta táctil */
+            color: white; /* Color de texto predeterminado */
+            padding: 20px; /* Padding general */
+        }
+
+        /* Contenedor principal del juego */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px; /* Espacio entre elementos */
+            max-width: 100%; /* Ancho máximo */
+        }
+
+        /* Contenedor de los bits individuales */
+        .bits-container {
+            display: flex;
+            gap: 15px; /* Espacio entre los bits */
+            align-items: center;
+            flex-wrap: wrap; /* Permite que los bits se envuelvan en pantallas pequeñas */
+            justify-content: center; /* Centra los bits */
+        }
+
+        /* Estilos para cada bit (círculo) */
+        .bit {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%; /* Forma circular */
+            background-color: #666666; /* Gris oscuro */
+            cursor: pointer; /* Cursor de puntero */
+            transition: all 0.3s ease; /* Transición suave para cambios de estado */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); /* Sombra sutil */
+            user-select: none; /* Evita la selección de texto */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            border: none; /* Sin borde */
+            outline: none; /* Sin contorno al enfocar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* Para posicionar la etiqueta */
+            flex-direction: column; /* Para apilar valor y etiqueta */
+        }
+
+        /* Efecto hover para los bits */
+        .bit:hover {
+            transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+        }
+
+        /* Efecto activo para los bits (al hacer click/tocar) */
+        .bit:active {
+            transform: scale(0.95); /* Ligeramente más pequeño al activar */
+        }
+
+        /* Estilos cuando el bit está "encendido" */
+        .bit.on {
+            background-color: #FFD700; /* Dorado */
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); /* Sombra dorada más intensa */
+        }
+
+        /* Efecto hover cuando el bit está "encendido" */
+        .bit.on:hover {
+            background-color: #FFED4E; /* Dorado más claro */
+        }
+
+        /* Estilos para el valor del bit (0 o 1) */
+        .bit-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333333; /* Gris oscuro */
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Sombra de texto */
+            transition: all 0.3s ease; /* Transición suave */
+        }
+
+        /* Estilos para el valor del bit cuando está "encendido" */
+        .bit.on .bit-value {
+            color: #1a1a1a; /* Casi negro */
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Sombra de texto más intensa */
+        }
+
+        /* Estilos para la etiqueta del bit (valor posicional) */
+        .bit-label {
+            position: absolute;
+            bottom: -30px; /* Posicionado debajo del bit */
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFD700; /* Dorado */
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); /* Sombra dorada */
+            opacity: 0; /* Inicialmente oculto */
+            transform: translateY(10px); /* Ligeramente desplazado hacia abajo */
+            transition: all 0.3s ease; /* Transición suave */
+            white-space: nowrap; /* Evita el salto de línea */
+        }
+
+        /* Estilos para la etiqueta del bit cuando está "encendido" */
+        .bit.on .bit-label {
+            opacity: 1; /* Visible */
+            transform: translateY(0); /* Vuelve a su posición original */
+        }
+
+        /* Estilos para la etiqueta del bit cuando es hermana y está dentro de un bit-wrapper */
+        .bit-wrapper .bit.on + .bit-label { /* Asume que .bit-label es el hermano inmediato */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Contenedor para cada bit y su etiqueta (para un mejor agrupamiento) */
+        .bit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px; /* Espacio inferior */
+        }
+
+        /* Contenedor de resultados */
+        .result-container {
+            text-align: center;
+            margin-top: 20px; /* Margen superior */
+        }
+
+        /* Estilos para la visualización binaria */
+        .binary-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700; /* Dorado */
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); /* Sombra dorada */
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace; /* Fuente monoespaciada */
+            letter-spacing: 8px; /* Espacio entre caracteres */
+        }
+
+        /* Estilos para la visualización decimal */
+        .decimal-display {
+            font-size: 24px;
+            color: #CCCCCC; /* Gris claro */
+            margin-bottom: 10px;
+        }
+
+        /* Estilos para la instrucción */
+        .instruction {
+            font-size: 16px;
+            color: #888888; /* Gris medio */
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 600px; /* Ancho máximo para el texto */
+        }
+
+        /* Estilos para la información de rango */
+        .range-info {
+            font-size: 14px;
+            color: #666666; /* Gris oscuro */
+            margin-top: 10px;
+        }
+
+        /* Diseño responsivo para pantallas más pequeñas (ej. móviles) */
+        @media (max-width: 768px) {
+            .bits-container {
+                gap: 10px; /* Reduce el espacio entre bits */
+            }
+            
+            .bit {
+                width: 60px; /* Reduce el tamaño de los bits */
+                height: 60px;
+            }
+            
+            .bit-value {
+                font-size: 24px; /* Reduce el tamaño de la fuente del valor del bit */
+            }
+            
+            .binary-display {
+                font-size: 20px; /* Reduce el tamaño de la fuente binaria */
+                letter-spacing: 4px; /* Reduce el espacio entre caracteres binarios */
+            }
+            
+            .bit-label {
+                font-size: 12px; /* Reduce el tamaño de la fuente de la etiqueta */
+            }
+        }
+
+        /* Efectos adicionales para mejor feedback táctil en dispositivos sin hover */
+        @media (hover: none) and (pointer: coarse) {
+            .bit:hover {
+                transform: none; /* Deshabilita el efecto hover en táctil */
+            }
+            
+            .bit:active {
+                transform: scale(0.9); /* Mantiene un efecto activo más pronunciado */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="instruction">
+            Toca los círculos para cambiar los bits. Los valores posicionales aparecen cuando el bit está encendido.
+        </div>
+        
+        <div class="bit-container">
+            <div class="bits-container">
+                <div class="bit" data-position="7" data-value="128">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">128</div>
+                </div>
+                
+                <div class="bit" data-position="6" data-value="64">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">64</div>
+                </div>
+                
+                <div class="bit" data-position="5" data-value="32">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">32</div>
+                </div>
+                
+                <div class="bit" data-position="4" data-value="16">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">16</div>
+                </div>
+                
+                <div class="bit" data-position="3" data-value="8">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">8</div>
+                </div>
+                
+                <div class="bit" data-position="2" data-value="4">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">4</div>
+                </div>
+                
+                <div class="bit" data-position="1" data-value="2">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">2</div>
+                </div>
+                
+                <div class="bit" data-position="0" data-value="1">
+                    <div class="bit-value">0</div>
+                    <div class="bit-label">1</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <div class="binary-display" id="binaryDisplay">00000000</div>
+            <div class="decimal-display">Decimal: <span id="decimalValue">0</span></div>
+            <div class="range-info">Rango: 0 - 255 (1 byte)</div>
+        </div>
+    </div>
+
+    <script>
+        // Selecciona todos los elementos con la clase 'bit'
+        const bits = document.querySelectorAll('.bit');
+        // Selecciona el elemento donde se mostrará el valor binario
+        const binaryDisplay = document.getElementById('binaryDisplay');
+        // Selecciona el elemento donde se mostrará el valor decimal
+        const decimalValue = document.getElementById('decimalValue');
+        
+        // Array para almacenar el estado de cada bit (true para '1', false para '0')
+        // Inicialmente, todos los bits están en 0 (false)
+        let bitStates = new Array(8).fill(false);
+        
+        /**
+         * Alterna el estado de un bit (encendido/apagado) y actualiza su apariencia.
+         * @param {HTMLElement} bitElement - El elemento DOM del bit.
+         * @param {number} position - La posición del bit en el array (0-7).
+         */
+        function toggleBit(bitElement, position) {
+            const isOn = bitStates[position]; // Verifica el estado actual
+            bitStates[position] = !isOn; // Invierte el estado
+            
+            // Añade o quita la clase 'on' para cambiar el estilo visual
+            bitElement.classList.toggle('on', bitStates[position]);
+            // Selecciona el elemento que muestra el valor (0 o 1) dentro del bit
+            const valueElement = bitElement.querySelector('.bit-value');
+            // Actualiza el texto del valor a '1' si está encendido, '0' si está apagado
+            valueElement.textContent = bitStates[position] ? '1' : '0';
+            
+            // Llama a la función para actualizar los displays binario y decimal
+            updateDisplays();
+        }
+        
+        /**
+         * Actualiza la visualización del valor binario y decimal.
+         */
+        function updateDisplays() {
+            // Actualiza el display binario:
+            // 1. Crea una copia del array bitStates.
+            // 2. Invierte el orden para que el bit más significativo (posición 7) esté a la izquierda.
+            // 3. Mapea cada estado a '1' o '0'.
+            // 4. Une los caracteres para formar la cadena binaria.
+            const binaryString = bitStates.slice().reverse().map(state => state ? '1' : '0').join('');
+            binaryDisplay.textContent = binaryString;
+            
+            // Calcula y muestra el valor decimal:
+            let decimal = 0;
+            // Itera sobre cada bit y su posición
+            bitStates.forEach((state, index) => {
+                // Si el bit está encendido, suma su valor posicional (2 elevado a la potencia de su índice)
+                if (state) {
+                    decimal += Math.pow(2, index);
+                }
+            });
+            // Actualiza el texto del valor decimal
+            decimalValue.textContent = decimal;
+        }
+        
+        // Añade event listeners a cada elemento 'bit'
+        bits.forEach((bit) => {
+            // Obtiene la posición del bit desde el atributo 'data-position'
+            const position = parseInt(bit.dataset.position);
+            
+            // Función que maneja el toggle del bit
+            function handleToggle() {
+                toggleBit(bit, position);
+            }
+            
+            // Soporte para eventos de click (ratón)
+            bit.addEventListener('click', handleToggle);
+            
+            // Soporte para eventos táctiles (móviles):
+            // touchstart: previene el comportamiento predeterminado (ej. zoom en doble tap)
+            bit.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+            });
+            // touchend: ejecuta la función de toggle cuando el toque termina
+            bit.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleToggle();
+            });
+        });
+        
+        // Previene el zoom en doble tap en toda la página en dispositivos móviles
+        // Esto es útil si el usuario intenta hacer doble tap rápidamente fuera de un bit
+        document.addEventListener('touchstart', function(e) {
+            // Si el objetivo del toque es un bit o un descendiente de un bit, previene el default
+            if (e.target.closest('.bit')) {
+                e.preventDefault();
+            }
+        }, { passive: false }); // 'passive: false' es necesario para poder llamar a preventDefault
+        
+        // Inicializa los displays al cargar la página para asegurar que los valores iniciales sean correctos
+        updateDisplays();
+    </script>
+</body>
+</html>
