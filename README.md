@@ -45,7 +45,7 @@ Aquest projecte està sota la llicència [MIT](LICENSE).
 
 ## Autor
 
-[El teu nom o nom d'usuari de GitHub]
+cserra16
 
 ---
 
