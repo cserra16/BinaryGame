@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Conversión Decimal a Binario</title>
+    <style>
+        /* Reset de márgenes y paddings, y box-sizing */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Estilos generales del cuerpo */
+        body {
+            background-color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            color: white;
+            padding: 20px;
+        }
+
+        /* Contenedor principal del juego */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 100%;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Panel de información superior */
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background-color: #111111;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .score, .timer, .target, .level {
+            text-align: center;
+        }
+
+        .score h3, .timer h3, .target h3, .level h3 {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 5px;
+        }
+
+        .level-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #9B59B6;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .timer-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FF6B6B;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        .timer-value.warning {
+            color: #FF4757;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .target-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4ECDC4;
+            text-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
+        }
+
+        /* Contenedor de los bits individuales */
+        .bits-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Estilos para cada bit (círculo) */
+        .bit {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #666666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            border: none;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-direction: column;
+        }
+
+        .bit.disabled {
+            background-color: #333333;
+            cursor: not-allowed;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .bit:hover {
+            transform: scale(1.05);
+        }
+
+        .bit:active {
+            transform: scale(0.95);
+        }
+
+        .bit.on {
+            background-color: #FFD700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+        }
+
+        .bit.on:hover {
+            background-color: #FFED4E;
+        }
+
+        .bit-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333333;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .bit.on .bit-value {
+            color: #1a1a1a;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .bit-label {
+            position: absolute;
+            bottom: -25px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .bit.on .bit-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Contenedor de resultados */
+        .result-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .binary-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 6px;
+        }
+
+        /* Botones de acción */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-check {
+            background-color: #4ECDC4;
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-check:hover {
+            background-color: #45B7AF;
+            transform: translateY(-2px);
+        }
+
+        .btn-skip {
+            background-color: #FF6B6B;
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-skip:hover {
+            background-color: #FF5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background-color: #95A5A6;
+            color: white;
+            box-shadow: 0 0 20px rgba(149, 165, 166, 0.3);
+        }
+
+        .btn-reset:hover {
+            background-color: #7F8C8D;
+            transform: translateY(-2px);
+        }
+
+        /* Feedback visual */
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            z-index: 1000;
+        }
+
+        .feedback.correct {
+            color: #4ECDC4;
+            text-shadow: 0 0 30px rgba(78, 205, 196, 0.8);
+        }
+
+        .feedback.incorrect {
+            color: #FF6B6B;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        /* Level up notification */
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(155, 89, 182, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            z-index: 1500;
+        }
+
+        .level-up.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .level-up h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .level-up p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-over h2 {
+            font-size: 48px;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        .final-score {
+            font-size: 32px;
+            color: #4ECDC4;
+            margin-bottom: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .info-panel {
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+            }
+
+            .info-panel > div {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .bits-container {
+                gap: 8px;
+            }
+            
+            .bit {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .bit-value {
+                font-size: 22px;
+            }
+            
+            .binary-display {
+                font-size: 18px;
+                letter-spacing: 3px;
+            }
+
+            .target-value {
+                font-size: 28px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .bit:hover {
+                transform: none;
+            }
+            
+            .bit:active {
+                transform: scale(0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="info-panel">
+            <div class="level">
+                <h3>NIVEL</h3>
+                <div class="level-value" id="levelValue">1</div>
+            </div>
+            <div class="score">
+                <h3>PUNTOS</h3>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div class="target">
+                <h3>CONVIERTE A BINARIO</h3>
+                <div class="target-value" id="targetNumber">0</div>
+            </div>
+            <div class="timer">
+                <h3>TIEMPO</h3>
+                <div class="timer-value" id="timerValue">60</div>
+            </div>
+        </div>
+        
+        <div class="bits-container">
+            <div class="bit" data-position="7" data-value="128">
+                <div class="bit-value">0</div>
+                <div class="bit-label">128</div>
+            </div>
+            
+            <div class="bit" data-position="6" data-value="64">
+                <div class="bit-value">0</div>
+                <div class="bit-label">64</div>
+            </div>
+            
+            <div class="bit" data-position="5" data-value="32">
+                <div class="bit-value">0</div>
+                <div class="bit-label">32</div>
+            </div>
+            
+            <div class="bit" data-position="4" data-value="16">
+                <div class="bit-value">0</div>
+                <div class="bit-label">16</div>
+            </div>
+            
+            <div class="bit" data-position="3" data-value="8">
+                <div class="bit-value">0</div>
+                <div class="bit-label">8</div>
+            </div>
+            
+            <div class="bit" data-position="2" data-value="4">
+                <div class="bit-value">0</div>
+                <div class="bit-label">4</div>
+            </div>
+            
+            <div class="bit" data-position="1" data-value="2">
+                <div class="bit-value">0</div>
+                <div class="bit-label">2</div>
+            </div>
+            
+            <div class="bit" data-position="0" data-value="1">
+                <div class="bit-value">0</div>
+                <div class="bit-label">1</div>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <div class="binary-display" id="binaryDisplay">00000000</div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-check" id="checkBtn">Verificar</button>
+            <button class="btn btn-skip" id="skipBtn">Saltar (-1)</button>
+            <button class="btn btn-reset" id="resetBtn">Reiniciar</button>
+        </div>
+    </div>
+
+    <!-- Feedback visual -->
+    <div class="feedback" id="feedback"></div>
+
+    <!-- Level up notification -->
+    <div class="level-up" id="levelUp">
+        <h3>¡NIVEL COMPLETADO!</h3>
+        <p>Nuevo bit desbloqueado</p>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="game-over" id="gameOver">
+        <h2>¡Tiempo Agotado!</h2>
+        <div class="final-score" id="finalScore">Puntuación Final: 0</div>
+        <button class="btn btn-reset" onclick="startNewGame()">Jugar de Nuevo</button>
+    </div>
+
+    <script>
+        // Variables del juego
+        const bits = document.querySelectorAll('.bit');
+        const binaryDisplay = document.getElementById('binaryDisplay');
+        const targetNumber = document.getElementById('targetNumber');
+        const scoreValue = document.getElementById('scoreValue');
+        const timerValue = document.getElementById('timerValue');
+        const levelValue = document.getElementById('levelValue');
+        const checkBtn = document.getElementById('checkBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const feedback = document.getElementById('feedback');
+        const gameOver = document.getElementById('gameOver');
+        const finalScore = document.getElementById('finalScore');
+        const levelUp = document.getElementById('levelUp');
+        
+        let bitStates = new Array(8).fill(false);
+        let currentTarget = 0;
+        let score = 0;
+        let timeLeft = 180;
+        let currentLevel = 1;
+        let activeBits = 4; // Empezar con 4 bits
+        let gameTimer = null;
+        let isGameActive = false;
+
+        // Inicializar el juego
+        function initGame() {
+            updateBitVisibility();
+            generateNewTarget();
+            resetBits();
+            updateDisplays();
+            startTimer();
+            isGameActive = true;
+        }
+
+        // Actualizar visibilidad de bits según el nivel
+        function updateBitVisibility() {
+            bits.forEach((bit, index) => {
+                const position = parseInt(bit.dataset.position);
+                // Los bits se ordenan de mayor a menor posición (7,6,5,4,3,2,1,0)
+                // Queremos mostrar los primeros 'activeBits' bits (las posiciones más bajas)
+                if (position < activeBits) {
+                    bit.classList.remove('disabled');
+                } else {
+                    bit.classList.add('disabled');
+                }
+            });
+        }
+
+        // Generar nuevo número objetivo según el nivel actual
+        function generateNewTarget() {
+            const maxValue = Math.pow(2, activeBits) - 1; // 2^activeBits - 1
+            currentTarget = Math.floor(Math.random() * (maxValue + 1));
+            targetNumber.textContent = currentTarget;
+        }
+
+        // Resetear todos los bits
+        function resetBits() {
+            bitStates.fill(false);
+            bits.forEach(bit => {
+                bit.classList.remove('on');
+                bit.querySelector('.bit-value').textContent = '0';
+            });
+        }
+
+        // Alternar estado del bit
+        function toggleBit(bitElement, position) {
+            if (!isGameActive) return;
+            
+            // No permitir alternar bits deshabilitados
+            if (bitElement.classList.contains('disabled')) return;
+            
+            bitStates[position] = !bitStates[position];
+            bitElement.classList.toggle('on', bitStates[position]);
+            const valueElement = bitElement.querySelector('.bit-value');
+            valueElement.textContent = bitStates[position] ? '1' : '0';
+            updateDisplays();
+        }
+
+        // Actualizar displays
+        function updateDisplays() {
+            // Mostrar solo los bits activos en el display
+            const binaryString = bitStates.slice(0, activeBits).reverse().map(state => state ? '1' : '0').join('');
+            // Rellenar con ceros a la izquierda para mostrar todos los bits del nivel actual
+            const paddedBinary = binaryString.padStart(activeBits, '0');
+            binaryDisplay.textContent = paddedBinary;
+        }
+
+        // Calcular valor decimal actual (solo bits activos)
+        function getCurrentDecimal() {
+            let decimal = 0;
+            for (let i = 0; i < activeBits; i++) {
+                if (bitStates[i]) {
+                    decimal += Math.pow(2, i);
+                }
+            }
+            return decimal;
+        }
+
+        // Verificar respuesta
+        function checkAnswer() {
+            if (!isGameActive) return;
+            
+            const currentDecimal = getCurrentDecimal();
+            const isCorrect = currentDecimal === currentTarget;
+            
+            if (isCorrect) {
+                score++;
+                showFeedback('¡Correcto! +1', 'correct');
+                
+                // Verificar si debe subir de nivel
+                if (score >= currentLevel * 10 && activeBits < 8) {
+                    advanceToNextLevel();
+                } else {
+                    generateNewTarget();
+                    resetBits();
+                }
+            } else {
+                score--;
+                showFeedback('Incorrecto -1', 'incorrect');
+            }
+            
+            updateScore();
+            updateDisplays();
+        }
+
+        // Subir de nivel
+        function advanceToNextLevel() {
+            currentLevel++;
+            activeBits = Math.min(activeBits + 1, 8); // Máximo 8 bits
+            
+            showLevelUpNotification();
+            
+            setTimeout(() => {
+                updateBitVisibility();
+                generateNewTarget();
+                resetBits();
+                updateDisplays();
+                updateLevel();
+            }, 2000);
+        }
+
+        // Mostrar notificación de nivel completado
+        function showLevelUpNotification() {
+            levelUp.classList.add('show');
+            setTimeout(() => {
+                levelUp.classList.remove('show');
+            }, 2000);
+        }
+
+        // Saltar pregunta
+        function skipQuestion() {
+            if (!isGameActive) return;
+            
+            score--;
+            showFeedback('Saltado -1', 'incorrect');
+            generateNewTarget();
+            resetBits();
+            updateScore();
+            updateDisplays();
+        }
+
+        // Mostrar feedback
+        function showFeedback(text, type) {
+            feedback.textContent = text;
+            feedback.className = `feedback ${type} show`;
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 1000);
+        }
+
+        // Actualizar puntuación
+        function updateScore() {
+            scoreValue.textContent = score;
+        }
+
+        // Actualizar nivel
+        function updateLevel() {
+            levelValue.textContent = currentLevel;
+        }
+
+        // Iniciar temporizador
+        function startTimer() {
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                timerValue.textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    timerValue.classList.add('warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Terminar juego
+        function endGame() {
+            isGameActive = false;
+            clearInterval(gameTimer);
+            finalScore.textContent = `Puntuación Final: ${score} (Nivel ${currentLevel})`;
+            gameOver.classList.add('show');
+        }
+
+        // Iniciar nuevo juego
+        function startNewGame() {
+            score = 0;
+            timeLeft = 180;
+            currentLevel = 1;
+            activeBits = 4;
+            isGameActive = false;
+            
+            updateScore();
+            updateLevel();
+            timerValue.textContent = timeLeft;
+            timerValue.classList.remove('warning');
+            gameOver.classList.remove('show');
+            
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            
+            setTimeout(() => {
+                initGame();
+            }, 500);
+        }
+
+        // Event listeners para los bits
+        bits.forEach((bit) => {
+            const position = parseInt(bit.dataset.position);
+            
+            function handleToggle() {
+                toggleBit(bit, position);
+            }
+            
+            bit.addEventListener('click', handleToggle);
+            
+            bit.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+            });
+            
+            bit.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleToggle();
+            });
+        });
+
+        // Event listeners para los botones
+        checkBtn.addEventListener('click', checkAnswer);
+        skipBtn.addEventListener('click', skipQuestion);
+        resetBtn.addEventListener('click', startNewGame);
+
+        // Atajos de teclado
+        document.addEventListener('keydown', (e) => {
+            if (!isGameActive) return;
+            
+            switch(e.key) {
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    checkAnswer();
+                    break;
+                case 'Escape':
+                    skipQuestion();
+                    break;
+            }
+        });
+
+        // Prevenir zoom en dispositivos móviles
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.closest('.bit')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Inicializar el juego al cargar
+        window.addEventListener('load', () => {
+            setTimeout(initGame, 500);
+        });
+    </script>
+</body>
+</html>
