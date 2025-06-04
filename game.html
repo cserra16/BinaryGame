@@ -41,11 +41,14 @@
         /* Panel de información superior */
         .info-panel {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around; /* Changed from space-between for better centering with max-width */
             align-items: center;
             width: 100%;
+            max-width: 680px; /* Adjusted max-width */
+            margin-left: auto; /* Center the panel */
+            margin-right: auto; /* Center the panel */
             background-color: #111111;
-            padding: 15px 25px;
+            padding: 15px 20px; /* Slightly reduced padding for a tighter look */
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
@@ -402,7 +405,32 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <!-- Pantalla de inicio para el nombre del jugador -->
+    <div id="playerSetup" class="modal" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px;">
+        <div style="background-color: #111; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%;">
+            <h2 style="color: #FFD700; margin-bottom: 20px;">¡Bienvenido al Juego Binario!</h2>
+            <p style="margin-bottom: 20px; color: #fff;">Ingresa tu nombre para comenzar a jugar y competir en el ranking global.</p>
+            <input type="text" id="playerName" placeholder="Tu nombre" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #FFD700; border-radius: 5px; background-color: #222; color: white; font-size: 16px;">
+            <button id="startGameBtn" style="background-color: #FFD700; color: #000; border: none; padding: 12px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">
+                Empezar a Jugar
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenedor del ranking -->
+    <div id="rankingContainer" style="position: fixed; top: 20px; right: 20px; background-color: rgba(17, 17, 17, 0.9); border-radius: 10px; padding: 15px; max-width: 300px; width: 100%; z-index: 100; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); display: none;">
+        <h3 style="color: #FFD700; margin-bottom: 10px; text-align: center;">🏆 Ranking</h3>
+        <div id="rankingTable" style="max-height: 400px; overflow-y: auto;">
+            <p style="color: #aaa; text-align: center;">Cargando ranking...</p>
+        </div>
+    </div>
+
+    <!-- Botón para mostrar/ocultar el ranking -->
+    <button id="toggleRankingBtn" style="position: fixed; top: 20px; right: 20px; background-color: #FFD700; color: #000; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; z-index: 100; display: none; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+        🏆
+    </button>
+
+    <div class="game-container" style="display: none;">
         <div class="info-panel">
             <div class="level">
                 <h3>NIVEL</h3>
@@ -469,9 +497,9 @@
         </div>
 
         <div class="action-buttons">
+            <button class="btn btn-reset" id="resetBtn">Reiniciar</button>
             <button class="btn btn-check" id="checkBtn">Verificar</button>
             <button class="btn btn-skip" id="skipBtn">Saltar (-1)</button>
-            <button class="btn btn-reset" id="resetBtn">Reiniciar</button>
         </div>
     </div>
 
@@ -484,11 +512,28 @@
         <p>Nuevo bit desbloqueado</p>
     </div>
 
-    <!-- Game Over Screen -->
-    <div class="game-over" id="gameOver">
-        <h2>¡Tiempo Agotado!</h2>
-        <div class="final-score" id="finalScore">Puntuación Final: 0</div>
-        <button class="btn btn-reset" onclick="startNewGame()">Jugar de Nuevo</button>
+    <!-- Game Over Modal -->
+    <div class="modal" id="gameOver" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px;">
+        <div class="modal-content" style="background-color: #111; padding: 30px; border-radius: 10px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h2 style="color: #FFD700; text-align: center; margin-bottom: 20px; font-size: 28px;">¡Juego Terminado!</h2>
+            <p id="finalScore" style="font-size: 24px; text-align: center; margin-bottom: 30px; color: #fff;">Puntuación Final: 0 (Nivel 1)</p>
+            
+            <div style="background-color: rgba(34, 34, 34, 0.8); border-radius: 10px; padding: 20px; margin-bottom: 30px;">
+                <h3 style="color: #FFD700; text-align: center; margin-bottom: 15px; font-size: 22px;">🏆 Ranking Global 🏆</h3>
+                <div id="endGameRankingTable" style="max-height: 40vh; overflow-y: auto;">
+                    <p style="color: #aaa; text-align: center;">Cargando ranking...</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <button id="newGameEndScreenBtn" style="background-color: #FFD700; color: #000; border: none; padding: 12px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">
+                    Jugar de Nuevo
+                </button>
+                <button id="backToMenuBtn" style="background-color: #333; color: #fff; border: 2px solid #FFD700; padding: 12px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">
+                    Volver al Menú
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -688,12 +733,61 @@
             }, 1000);
         }
 
+        // Función para renderizar el ranking en la pantalla de fin de partida
+        function renderEndGameRanking(rankingData) {
+            const rankingTableDiv = document.getElementById('endGameRankingTable');
+            if (!rankingData || rankingData.length === 0) {
+                rankingTableDiv.innerHTML = '<p style="color: #aaa; text-align: center;">Aún no hay puntuaciones registradas.</p>';
+                return;
+            }
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr style="border-bottom: 2px solid #FFD700;">';
+            html += '<th style="text-align: left; padding: 10px 8px; color: #FFD700; font-size: 16px;">#</th>';
+            html += '<th style="text-align: left; padding: 10px 8px; color: #FFD700; font-size: 16px;">Jugador</th>';
+            html += '<th style="text-align: right; padding: 10px 8px; color: #FFD700; font-size: 16px;">Puntos</th>';
+            html += '</tr></thead><tbody>';
+            rankingData.forEach((player, index) => {
+                const isCurrent = player.name === currentPlayerName;
+                const rowStyle = isCurrent ? 'font-weight: bold; color: #FFD700;' : 'color: #fff;';
+                const rowBg = isCurrent ? 'background-color: rgba(255, 215, 0, 0.1);' : '';
+                html += `<tr style="border-bottom: 1px solid #444; ${rowBg}">`;
+                html += `<td style="padding: 10px 8px; ${rowStyle}">${index + 1}</td>`;
+                html += `<td style="padding: 10px 8px; ${rowStyle}">${escapeHtml(player.name)}</td>`;
+                html += `<td style="text-align: right; padding: 10px 8px; ${rowStyle}">${player.best_score}</td>`;
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            rankingTableDiv.innerHTML = html;
+        }
+
+        // Cargar y mostrar el ranking en la pantalla de fin de partida
+        async function loadAndShowEndGameRanking() {
+            const rankingTableDiv = document.getElementById('endGameRankingTable');
+            rankingTableDiv.innerHTML = '<p style="color: #aaa; text-align: center;">Cargando ranking...</p>'; // Mostrar mensaje de carga
+            try {
+                const response = await fetch('/api/ranking');
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                const ranking = await response.json();
+                renderEndGameRanking(ranking);
+            } catch (error) {
+                console.error('Error al cargar el ranking final:', error);
+                rankingTableDiv.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Error al cargar el ranking. Intenta de nuevo.</p>';
+            }
+        }
+
         // Terminar juego
-        function endGame() {
+        async function endGame() {
             isGameActive = false;
             clearInterval(gameTimer);
-            finalScore.textContent = `Puntuación Final: ${score} (Nivel ${currentLevel})`;
-            gameOver.classList.add('show');
+            document.getElementById('finalScore').textContent = `Puntuación Final: ${score} (Nivel ${currentLevel})`;
+            
+            const gameOverModal = document.getElementById('gameOver');
+            gameOverModal.style.display = 'flex'; // Mostrar el modal
+            
+            if (currentPlayerName) {
+                await submitScore(score); // Esperar a que la puntuación se envíe
+            }
+            await loadAndShowEndGameRanking(); // Cargar ranking después de enviar o si no hay jugador
         }
 
         // Iniciar nuevo juego
@@ -719,6 +813,114 @@
             }, 500);
         }
 
+        // Variable global para el nombre del jugador
+        let currentPlayerName = '';
+
+        // Event listener para el botón de inicio
+        document.getElementById('startGameBtn').addEventListener('click', function() {
+            const nameInput = document.getElementById('playerName');
+            if (nameInput.value.trim() === '') {
+                alert('Por favor, ingresa tu nombre para continuar.');
+                return;
+            }
+            currentPlayerName = nameInput.value.trim();
+            document.getElementById('playerSetup').style.display = 'none';
+            document.querySelector('.game-container').style.display = 'flex';
+            document.getElementById('toggleRankingBtn').style.display = 'flex';
+            loadRanking();
+            initGame();
+        });
+
+        // Toggle ranking visibility
+        document.getElementById('toggleRankingBtn').addEventListener('click', function() {
+            const rankingContainer = document.getElementById('rankingContainer');
+            const isVisible = rankingContainer.style.display === 'block';
+            rankingContainer.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Función para cargar el ranking
+        async function loadRanking() {
+            try {
+                const response = await fetch('/api/ranking');
+                if (!response.ok) throw new Error('Error al cargar el ranking');
+                const ranking = await response.json();
+                
+                const rankingTable = document.getElementById('rankingTable');
+                
+                if (ranking.length === 0) {
+                    rankingTable.innerHTML = '<p style="color: #aaa; text-align: center;">Aún no hay puntuaciones registradas.</p>';
+                    return;
+                }
+                
+                let html = '<table style="width: 100%; border-collapse: collapse;">';
+                html += '<tr style="border-bottom: 1px solid #333;"><th style="text-align: left; padding: 5px 0; color: #FFD700;">#</th><th style="text-align: left; padding: 5px 0; color: #FFD700;">Jugador</th><th style="text-align: right; padding: 5px 0; color: #FFD700;">Puntos</th></tr>';
+                
+                ranking.forEach((player, index) => {
+                    const isCurrentPlayer = player.name === currentPlayerName;
+                    const rowStyle = isCurrentPlayer ? 'font-weight: bold; color: #FFD700;' : 'color: #fff;';
+                    html += `<tr style="border-bottom: 1px solid #222; ${isCurrentPlayer ? 'background-color: rgba(255, 215, 0, 0.1);' : ''}">`;
+                    html += `<td style="padding: 8px 0; ${rowStyle}">${index + 1}</td>`;
+                    html += `<td style="padding: 8px 0; ${rowStyle}">${escapeHtml(player.name)}</td>`;
+                    html += `<td style="text-align: right; padding: 8px 0; ${rowStyle}">${player.best_score}</td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</table>';
+                rankingTable.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error al cargar el ranking:', error);
+                rankingTable.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Error al cargar el ranking. Intenta recargar la página.</p>';
+            }
+        }
+
+        // Función para escapar HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Función para enviar puntuación
+        async function submitScore(score) {
+            if (!currentPlayerName) return;
+            
+            try {
+                const response = await fetch('/api/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: currentPlayerName, score: score })
+                });
+                
+                if (response.ok) {
+                    loadRanking(); // Actualizar ranking después de enviar puntuación
+                } else {
+                    console.error('Error al enviar puntuación');
+                }
+            } catch (error) {
+                console.error('Error de red al enviar puntuación:', error);
+            }
+        }
+
+        // Volver al menú principal desde la pantalla de fin de juego
+        document.getElementById('backToMenuBtn').addEventListener('click', () => {
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('playerSetup').style.display = 'flex';
+            document.querySelector('.game-container').style.display = 'none';
+            document.getElementById('toggleRankingBtn').style.display = 'none';
+            document.getElementById('rankingContainer').style.display = 'none'; // Ocultar ranking lateral si estaba visible
+            // Resetear variables de juego si es necesario o hacerlo en initGame
+        });
+
+        // Nuevo juego desde la pantalla de fin de juego
+        document.getElementById('newGameEndScreenBtn').addEventListener('click', () => {
+            document.getElementById('gameOver').style.display = 'none';
+            startNewGame(); 
+        });
+
         // Event listeners para los bits
         bits.forEach((bit) => {
             const position = parseInt(bit.dataset.position);
@@ -739,10 +941,13 @@
             });
         });
 
-        // Event listeners para los botones
-        checkBtn.addEventListener('click', checkAnswer);
-        skipBtn.addEventListener('click', skipQuestion);
-        resetBtn.addEventListener('click', startNewGame);
+        // Event listeners para los botones de control
+        document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+        document.getElementById('skipBtn').addEventListener('click', skipQuestion);
+        document.getElementById('resetBtn').addEventListener('click', () => { 
+            resetBits(); 
+            updateDisplays(); // Asegurarse de que el display binario se actualice
+        });
 
         // Atajos de teclado
         document.addEventListener('keydown', (e) => {
@@ -767,10 +972,7 @@
             }
         }, { passive: false });
 
-        // Inicializar el juego al cargar
-        window.addEventListener('load', () => {
-            setTimeout(initGame, 500);
-        });
+
     </script>
 </body>
 </html>
