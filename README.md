@@ -1,6 +1,6 @@
 # Joc Binari - Aprenentatge de nombres binaris i adreces IP
 
-Aquest projecte és un joc interactiu dissenyat per ajudar a entendre els nombres binaris i el seu ús en les adreces IP. Inclou dues pàgines principals:
+Aquest projecte és un joc interactiu dissenyat per ajudar a entendre els nombres binaris i el seu ús en les adreces IP. Inclou tres pàgines principals:
 
 1. **Conversor Binari Bàsic** (`index.html`)
    - Visualitza la representació binària d'un byte (8 bits)
@@ -14,6 +14,15 @@ Aquest projecte és un joc interactiu dissenyat per ajudar a entendre els nombre
    - Mostra la conversió binària de cada octet
    - Permet entendre com es construeixen les adreces IP a partir de bits
 
+3. **Joc de Conversió Decimal a Binari** (`game.html`)
+   - Proposa nombres decimals aleatoris per convertir a binari
+   - Aconsegueix punts encertant abans que s'esgoti el temps
+   - Es troba al mateix directori i es pot obrir directament al navegador
+
+## Joc de Conversió Decimal a Binari (`game.html`)
+
+Aquest mode planteja nombres decimals que has de convertir a binari abans que s'acabi el temps. Clica els cercles per activar o desactivar bits fins formar el valor correcte i acumula punts amb cada encert. Obre "game.html" al navegador des del mateix directori per començar a jugar.
+
 ## Característiques
 
 - **Interfície intuïtiva** amb elements gràfics interactius
@@ -26,7 +35,8 @@ Aquest projecte és un joc interactiu dissenyat per ajudar a entendre els nombre
 
 1. Obre el fitxer `index.html` en un navegador web modern per accedir al conversor binari bàsic
 2. Obre el fitxer `ip.html` per explorar el simulador d'adreces IP
-3. Fes clic als cercles per activar/desactivar els bits i observar els canvis en temps real
+3. Obre el fitxer `game.html` per posar a prova la conversió de decimals a binari
+4. Fes clic als cercles per activar/desactivar els bits i observar els canvis en temps real
 
 ## Tecnologies utilitzades
 
