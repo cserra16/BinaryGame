@@ -49,7 +49,7 @@
         <div class="bits-container" id="bitsContainer"></div>
 
         <div>
-            <div class="binary-display" id="binaryDisplay">00000000</div>
+            <div class="binary-display" id="binaryDisplay">0000 0000</div>
             <div class="decimal-display"><span data-i18n="bits.decimal">Decimal:</span> <span id="decimalValue">0</span></div>
             <div class="range-info" data-i18n="bits.range">Rang: 0 - 255 (1 byte)</div>
         </div>
@@ -62,7 +62,7 @@
         const decimalValue = document.getElementById('decimalValue');
 
         const byte = createBitRow(document.getElementById('bitsContainer'), 8, (value, binary) => {
-            binaryDisplay.textContent = binary;
+            binaryDisplay.textContent = groupNibbles(binary);
             decimalValue.textContent = value;
         });
     </script>

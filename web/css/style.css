@@ -111,12 +111,19 @@ input:focus-visible {
 /* ---------- Bits ---------- */
 
 .bits-container {
+    --bit-gap: 12px;     /* entre bits de un mismo nibble */
+    --nibble-gap: 36px;  /* entre nibbles: "0101 1010" */
     display: flex;
-    gap: 12px;
+    gap: var(--nibble-gap);
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
     padding-bottom: 30px; /* espacio para las etiquetas */
+}
+
+.nibble {
+    display: flex;
+    gap: var(--bit-gap);
 }
 
 .bit {
@@ -340,7 +347,7 @@ input:focus-visible {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 768px) {
-    .bits-container { gap: 8px; }
+    .bits-container { --bit-gap: 8px; --nibble-gap: 24px; }
     .bit { width: 55px; height: 55px; }
     .bit-value { font-size: 22px; }
     .binary-display { font-size: 18px; letter-spacing: 3px; }
@@ -348,8 +355,9 @@ input:focus-visible {
 
 /* En móvil los 8 bits siempre en una fila: el tamaño se ajusta al ancho de pantalla */
 @media (max-width: 520px) {
-    .bits-container { gap: 6px; flex-wrap: nowrap; }
-    .bit { width: min(55px, calc((100vw - 82px) / 8)); height: auto; aspect-ratio: 1; }
+    /* 8 bits + 6 huecos entre bits + 1 hueco entre nibbles + márgenes de página */
+    .bits-container { --bit-gap: 5px; --nibble-gap: 18px; flex-wrap: nowrap; }
+    .bit { width: min(55px, calc((100vw - 88px) / 8)); height: auto; aspect-ratio: 1; }
     .bit-value { font-size: 18px; }
     .bit-label { font-size: 10px; }
 }

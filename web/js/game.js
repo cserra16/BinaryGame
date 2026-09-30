@@ -37,7 +37,7 @@ let nameErrorShown = false;
 const canPlay = () => isGameActive && !isLevelTransition;
 
 const bitRow = createBitRow($('bitsContainer'), MAX_BITS, (value, binary) => {
-    binaryDisplay.textContent = binary;
+    binaryDisplay.textContent = groupNibbles(binary);
 }, { canToggle: canPlay });
 
 // ---------- Ciclo de partida ----------

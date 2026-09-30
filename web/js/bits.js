@@ -1,3 +1,14 @@
+const NIBBLE_SIZE = 4;
+
+/** Separa una cadena binaria en grupos de 4 empezando por la derecha: "1011010" -> "101 1010". */
+function groupNibbles(binary) {
+    const groups = [];
+    for (let end = binary.length; end > 0; end -= NIBBLE_SIZE) {
+        groups.unshift(binary.slice(Math.max(0, end - NIBBLE_SIZE), end));
+    }
+    return groups.join(' ');
+}
+
 /**
  * Utilidad compartida: crea una fila de bits clicables dentro de `container`.
  *
@@ -15,7 +26,18 @@ function createBitRow(container, size, onChange, options = {}) {
     const elements = [];
     let enabledBits = size;
 
+    // Los bits se agrupan en nibbles (grupos de 4) para facilitar la lectura
+    // y preparar la conversión a hexadecimal: cada nibble es una cifra hex.
+    const nibbles = [];
+
     for (let position = size - 1; position >= 0; position--) {
+        const nibbleIndex = Math.floor(position / NIBBLE_SIZE);
+        if (!nibbles[nibbleIndex]) {
+            nibbles[nibbleIndex] = document.createElement('div');
+            nibbles[nibbleIndex].className = 'nibble';
+            container.appendChild(nibbles[nibbleIndex]);
+        }
+
         const bit = document.createElement('div');
         bit.className = 'bit';
         bit.setAttribute('role', 'button');
@@ -32,7 +54,7 @@ function createBitRow(container, size, onChange, options = {}) {
         });
 
         elements[position] = bit;
-        container.appendChild(bit);
+        nibbles[nibbleIndex].appendChild(bit);
     }
 
     // Etiqueta accesible traducida (i18n.js es opcional para esta utilidad)

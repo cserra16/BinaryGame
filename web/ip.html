@@ -46,7 +46,8 @@
         }
 
         .octet-container .bits-container {
-            gap: 8px;
+            --bit-gap: 6px;
+            --nibble-gap: 18px;
             padding-bottom: 22px;
         }
 
@@ -101,13 +102,13 @@
             .octet-container .bit { width: 34px; height: 34px; }
             .octet-container .bit-value { font-size: 16px; }
             .octet-container .bit-label { font-size: 10px; bottom: -18px; }
-            .octet-container .bits-container { gap: 5px; }
+            .octet-container .bits-container { --bit-gap: 4px; --nibble-gap: 12px; }
             .ip-display { font-size: 22px; }
             .result-container { width: 100%; max-width: 450px; min-width: unset; }
         }
 
         @media (max-width: 520px) {
-            .octet-container .bit { width: min(34px, calc((100vw - 110px) / 8)); }
+            .octet-container .bit { width: min(34px, calc((100vw - 112px) / 8)); }
         }
     </style>
 </head>
