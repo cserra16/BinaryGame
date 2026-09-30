@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Juegos para aprender a convertir números decimales a binario y direcciones IP.">
+    <title>Juego Binario</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .menu h1 {
+            color: var(--gold);
+            font-size: 42px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            text-align: center;
+        }
+
+        .menu h1 span {
+            font-family: 'Courier New', monospace;
+            display: block;
+            font-size: 18px;
+            letter-spacing: 6px;
+            color: var(--muted);
+            text-shadow: none;
+            margin-top: 8px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .card {
+            display: block;
+            background-color: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 25px 20px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover,
+        .card:focus-visible {
+            border-color: var(--gold);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .card .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .card h2 {
+            color: var(--gold);
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .card.main {
+            border-color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+    <main class="menu">
+        <h1>Juego Binario<span>01001010 01000010</span></h1>
+
+        <div class="cards">
+            <a class="card main" href="game.html">
+                <div class="icon">🎯</div>
+                <h2>Reto contrarreloj</h2>
+                <p>Convierte números decimales a binario antes de que se acabe el tiempo. Sube de nivel y desbloquea bits.</p>
+            </a>
+            <a class="card" href="bits.html">
+                <div class="icon">💡</div>
+                <h2>Práctica: 1 byte</h2>
+                <p>Enciende y apaga 8 bits libremente y observa su valor decimal (0 - 255).</p>
+            </a>
+            <a class="card" href="ip.html">
+                <div class="icon">🌐</div>
+                <h2>Práctica: dirección IP</h2>
+                <p>Construye una dirección IPv4 bit a bit con sus cuatro octetos.</p>
+            </a>
+        </div>
+    </main>
+</body>
+</html>

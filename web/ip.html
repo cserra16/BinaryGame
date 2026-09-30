@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Binario - Dirección IP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            padding-top: 30px;
+        }
+
+        .ip-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .octet-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background-color: var(--panel-2);
+            min-width: 280px;
+        }
+
+        .octet-title {
+            font-size: 18px;
+            color: var(--gold);
+        }
+
+        .octet-title span {
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+        }
+
+        .octet-container .bits-container {
+            gap: 8px;
+            padding-bottom: 22px;
+        }
+
+        .octet-container .bit {
+            width: 44px;
+            height: 44px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .octet-container .bit.on {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .octet-container .bit-value { font-size: 20px; }
+        .octet-container .bit-label { bottom: -20px; font-size: 11px; }
+
+        .result-container {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--panel-2);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-width: 280px;
+        }
+
+        .ip-display-label {
+            font-size: 16px;
+            color: #CCCCCC;
+            margin-bottom: 5px;
+        }
+
+        .ip-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            word-break: break-all;
+        }
+
+        .ip-binary {
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        @media (max-width: 768px) {
+            .octet-container { width: 100%; max-width: 450px; min-width: unset; }
+            .octet-container .bit { width: 34px; height: 34px; }
+            .octet-container .bit-value { font-size: 16px; }
+            .octet-container .bit-label { font-size: 10px; bottom: -18px; }
+            .octet-container .bits-container { gap: 5px; }
+            .ip-display { font-size: 22px; }
+            .result-container { width: 100%; max-width: 450px; min-width: unset; }
+        }
+
+        @media (max-width: 520px) {
+            .octet-container .bit { width: min(34px, calc((100vw - 110px) / 8)); }
+        }
+    </style>
+</head>
+<body>
+    <a class="home-link" href="index.html">← Menú</a>
+
+    <main class="game-container">
+        <p class="instruction">
+            Toca los círculos para cambiar los bits de cada octeto. Los valores posicionales aparecen cuando el bit está encendido.
+            La dirección IP resultante se muestra abajo.
+        </p>
+
+        <div class="ip-container" id="ipContainer"></div>
+
+        <div class="result-container">
+            <div class="ip-display-label">Dirección IP resultante:</div>
+            <div class="ip-display" id="ipDisplay">0.0.0.0</div>
+            <div class="ip-binary" id="ipBinary">00000000.00000000.00000000.00000000</div>
+        </div>
+    </main>
+
+    <script src="js/bits.js"></script>
+    <script>
+        const NUM_OCTETS = 4;
+        const ipContainer = document.getElementById('ipContainer');
+        const ipDisplay = document.getElementById('ipDisplay');
+        const ipBinary = document.getElementById('ipBinary');
+
+        const values = new Array(NUM_OCTETS).fill(0);
+        const binaries = new Array(NUM_OCTETS).fill('00000000');
+
+        function updateIpDisplay() {
+            ipDisplay.textContent = values.join('.');
+            ipBinary.textContent = binaries.join('.');
+        }
+
+        for (let i = 0; i < NUM_OCTETS; i++) {
+            const octet = document.createElement('section');
+            octet.className = 'octet-container';
+
+            const title = document.createElement('h3');
+            title.className = 'octet-title';
+            title.innerHTML = `Octeto ${i + 1}: <span>0</span>`;
+            const titleValue = title.querySelector('span');
+
+            const bitsDiv = document.createElement('div');
+            bitsDiv.className = 'bits-container';
+
+            octet.append(title, bitsDiv);
+            ipContainer.appendChild(octet);
+
+            createBitRow(bitsDiv, 8, (value, binary) => {
+                values[i] = value;
+                binaries[i] = binary;
+                titleValue.textContent = value;
+                updateIpDisplay();
+            });
+        }
+    </script>
+</body>
+</html>

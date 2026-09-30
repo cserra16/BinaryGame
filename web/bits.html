@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Binario - 8 Bits</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            max-width: 100%;
+        }
+
+        .binary-display {
+            font-size: 28px;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+        }
+
+        .decimal-display {
+            font-size: 24px;
+            color: #CCCCCC;
+            text-align: center;
+        }
+
+        .range-info {
+            font-size: 14px;
+            color: var(--bit-off);
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <a class="home-link" href="index.html">← Menú</a>
+
+    <main class="game-container">
+        <p class="instruction">
+            Toca los círculos para cambiar los bits. Los valores posicionales aparecen cuando el bit está encendido.
+        </p>
+
+        <div class="bits-container" id="bitsContainer"></div>
+
+        <div>
+            <div class="binary-display" id="binaryDisplay">00000000</div>
+            <div class="decimal-display">Decimal: <span id="decimalValue">0</span></div>
+            <div class="range-info">Rango: 0 - 255 (1 byte)</div>
+        </div>
+    </main>
+
+    <script src="js/bits.js"></script>
+    <script>
+        const binaryDisplay = document.getElementById('binaryDisplay');
+        const decimalValue = document.getElementById('decimalValue');
+
+        const byte = createBitRow(document.getElementById('bitsContainer'), 8, (value, binary) => {
+            binaryDisplay.textContent = binary;
+            decimalValue.textContent = value;
+        });
+    </script>
+</body>
+</html>

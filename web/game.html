@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Binario - Reto contrarreloj</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Panel de información superior */
+        .info-panel {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            max-width: 680px;
+            background-color: var(--panel);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .info-panel > div {
+            text-align: center;
+        }
+
+        .info-panel h3 {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+
+        .level-value { font-size: 24px; font-weight: bold; color: var(--purple); text-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
+        .score-value { font-size: 28px; font-weight: bold; color: var(--gold); text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .timer-value { font-size: 28px; font-weight: bold; color: var(--red); text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+        .target-value { font-size: 36px; font-weight: bold; color: var(--teal); text-shadow: 0 0 15px rgba(78, 205, 196, 0.5); }
+
+        .timer-value.warning {
+            color: #FF4757;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .shortcuts {
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+        }
+
+        /* Feedback visual */
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        .feedback.correct { color: var(--teal); text-shadow: 0 0 30px rgba(78, 205, 196, 0.8); }
+        .feedback.incorrect { color: var(--red); text-shadow: 0 0 30px rgba(255, 107, 107, 0.8); }
+        .feedback.show { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+
+        /* Notificación de nivel */
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
+            color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(155, 89, 182, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            z-index: 1500;
+        }
+
+        .level-up.show { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        .level-up h3 { font-size: 28px; margin-bottom: 10px; }
+        .level-up p { font-size: 16px; opacity: 0.9; }
+
+        /* Ranking lateral */
+        .toggle-ranking {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 101;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .ranking-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: rgba(17, 17, 17, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            width: min(300px, calc(100% - 40px));
+            max-height: 60vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .ranking-panel h3 {
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .info-panel { flex-wrap: wrap; gap: 15px; margin-top: 50px; }
+            .info-panel > div { flex: 1; min-width: 120px; }
+            .target-value { font-size: 28px; }
+            .action-buttons { flex-direction: column; width: 100%; max-width: 300px; }
+            .shortcuts { display: none; }
+            .feedback { font-size: 34px; }
+        }
+    </style>
+</head>
+<body>
+    <a class="home-link" href="index.html">← Menú</a>
+
+    <!-- Pantalla de inicio para el nombre del jugador -->
+    <div class="modal" id="playerSetup">
+        <form class="modal-content" id="setupForm" novalidate>
+            <h2>¡Bienvenido al Juego Binario!</h2>
+            <p>Ingresa tu nombre para comenzar a jugar y entrar en el ranking.</p>
+            <input type="text" id="playerName" placeholder="Tu nombre" maxlength="20" autocomplete="nickname" autofocus>
+            <div class="error-text" id="nameError"></div>
+            <button type="submit" class="btn btn-primary">Empezar a Jugar</button>
+        </form>
+    </div>
+
+    <!-- Ranking lateral -->
+    <button class="toggle-ranking" id="toggleRankingBtn" aria-label="Mostrar ranking" hidden>🏆</button>
+    <aside class="ranking-panel" id="rankingPanel" hidden>
+        <h3>🏆 Ranking</h3>
+        <div id="rankingTable"></div>
+    </aside>
+
+    <main class="game-container" id="gameContainer" hidden>
+        <div class="info-panel">
+            <div>
+                <h3>NIVEL</h3>
+                <div class="level-value" id="levelValue">1</div>
+            </div>
+            <div>
+                <h3>PUNTOS</h3>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div>
+                <h3>CONVIERTE A BINARIO</h3>
+                <div class="target-value" id="targetNumber">0</div>
+            </div>
+            <div>
+                <h3>TIEMPO</h3>
+                <div class="timer-value" id="timerValue">180</div>
+            </div>
+        </div>
+
+        <div class="bits-container" id="bitsContainer"></div>
+
+        <div class="binary-display" id="binaryDisplay">0000</div>
+
+        <div class="action-buttons">
+            <button class="btn btn-reset" id="resetBtn">Reiniciar</button>
+            <button class="btn btn-check" id="checkBtn">Verificar</button>
+            <button class="btn btn-skip" id="skipBtn">Saltar (-1)</button>
+        </div>
+        <p class="shortcuts">Atajos: Enter / Espacio = verificar · Esc = saltar</p>
+    </main>
+
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+
+    <div class="level-up" id="levelUp">
+        <h3>¡NIVEL COMPLETADO!</h3>
+        <p>Nuevo bit desbloqueado</p>
+    </div>
+
+    <!-- Fin de partida -->
+    <div class="modal" id="gameOver" hidden>
+        <div class="modal-content">
+            <h2>¡Juego Terminado!</h2>
+            <p id="finalScore" style="font-size: 24px;">Puntuación Final: 0 (Nivel 1)</p>
+            <div class="ranking-box">
+                <h3>🏆 Ranking 🏆</h3>
+                <div id="endGameRankingTable"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="newGameBtn">Jugar de Nuevo</button>
+                <button class="btn btn-secondary" id="backToMenuBtn">Cambiar Jugador</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/bits.js"></script>
+    <script src="js/ranking.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
