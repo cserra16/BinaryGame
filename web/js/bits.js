@@ -20,7 +20,6 @@ function createBitRow(container, size, onChange, options = {}) {
         bit.className = 'bit';
         bit.setAttribute('role', 'button');
         bit.setAttribute('aria-pressed', 'false');
-        bit.setAttribute('aria-label', `Bit de valor ${2 ** position}`);
         bit.innerHTML = `<span class="bit-value">0</span><span class="bit-label">${2 ** position}</span>`;
 
         // Con `touch-action: manipulation` en el CSS basta el evento click tanto
@@ -35,6 +34,17 @@ function createBitRow(container, size, onChange, options = {}) {
         elements[position] = bit;
         container.appendChild(bit);
     }
+
+    // Etiqueta accesible traducida (i18n.js es opcional para esta utilidad)
+    const hasI18n = typeof I18n !== 'undefined';
+    function renderLabels() {
+        elements.forEach((bit, position) => {
+            const value = 2 ** position;
+            bit.setAttribute('aria-label', hasI18n ? I18n.t('bit.aria', { value }) : `Bit ${value}`);
+        });
+    }
+    renderLabels();
+    if (hasI18n) I18n.onChange(renderLabels);
 
     function render(position) {
         const bit = elements[position];

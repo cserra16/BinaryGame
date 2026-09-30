@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego Binario - 8 Bits</title>
+    <title data-i18n="bits.title">Joc Binari - 8 bits</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .game-container {
@@ -35,22 +35,27 @@
     </style>
 </head>
 <body>
-    <a class="home-link" href="index.html">← Menú</a>
+    <nav class="topbar">
+        <a class="home-link" href="index.html" data-i18n="nav.menu">← Menú</a>
+        <div class="lang-switch" role="group" aria-label="Idioma / Language">
+            <button type="button" data-lang="ca">CA</button>
+            <button type="button" data-lang="en">EN</button>
+        </div>
+    </nav>
 
     <main class="game-container">
-        <p class="instruction">
-            Toca los círculos para cambiar los bits. Los valores posicionales aparecen cuando el bit está encendido.
-        </p>
+        <p class="instruction" data-i18n="bits.instruction">Toca els cercles per canviar els bits. Els valors posicionals apareixen quan el bit està encès.</p>
 
         <div class="bits-container" id="bitsContainer"></div>
 
         <div>
             <div class="binary-display" id="binaryDisplay">00000000</div>
-            <div class="decimal-display">Decimal: <span id="decimalValue">0</span></div>
-            <div class="range-info">Rango: 0 - 255 (1 byte)</div>
+            <div class="decimal-display"><span data-i18n="bits.decimal">Decimal:</span> <span id="decimalValue">0</span></div>
+            <div class="range-info" data-i18n="bits.range">Rang: 0 - 255 (1 byte)</div>
         </div>
     </main>
 
+    <script src="js/i18n.js"></script>
     <script src="js/bits.js"></script>
     <script>
         const binaryDisplay = document.getElementById('binaryDisplay');

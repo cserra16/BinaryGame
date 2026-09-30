@@ -12,6 +12,7 @@ web/
 ├── ip.html      Práctica de direcciones IPv4
 ├── css/style.css
 └── js/
+    ├── i18n.js     Traducciones (catalán e inglés)
     ├── bits.js     Fila de bits reutilizable
     ├── ranking.js  Ranking (localStorage o API opcional)
     └── game.js     Lógica del reto
@@ -30,6 +31,16 @@ como en una subcarpeta (`https://servidor/binario/`).
   docker run -d -p 8080:80 -v "$PWD/web":/usr/share/nginx/html:ro nginx:alpine
   ```
 - **GitHub Pages / Netlify / Moodle:** subir la carpeta `web/` tal cual.
+
+## Idiomas
+
+La interfaz está en **catalán** (por defecto) e **inglés**. El selector CA / EN
+de la barra superior cambia el idioma en todas las páginas y se recuerda en el
+navegador. También se puede forzar con la URL: `game.html?lang=en`.
+
+Los textos están en `js/i18n.js`. Para añadir otro idioma (por ejemplo
+castellano), copia el bloque `en`, tradúcelo con la clave `es` y añade un botón
+`<button type="button" data-lang="es">ES</button>` en cada `.lang-switch`.
 
 ## Ranking
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego Binario - Reto contrarreloj</title>
+    <title data-i18n="game.title">Joc Binari - Repte contrarellotge</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .game-container {
@@ -145,7 +145,7 @@
         }
 
         @media (max-width: 768px) {
-            .info-panel { flex-wrap: wrap; gap: 15px; margin-top: 50px; }
+            .info-panel { flex-wrap: wrap; gap: 15px; margin-top: 60px; }
             .info-panel > div { flex: 1; min-width: 120px; }
             .target-value { font-size: 28px; }
             .action-buttons { flex-direction: column; width: 100%; max-width: 300px; }
@@ -155,42 +155,48 @@
     </style>
 </head>
 <body>
-    <a class="home-link" href="index.html">← Menú</a>
+    <nav class="topbar">
+        <a class="home-link" href="index.html" data-i18n="nav.menu">← Menú</a>
+        <div class="lang-switch" role="group" aria-label="Idioma / Language">
+            <button type="button" data-lang="ca">CA</button>
+            <button type="button" data-lang="en">EN</button>
+        </div>
+    </nav>
 
     <!-- Pantalla de inicio para el nombre del jugador -->
     <div class="modal" id="playerSetup">
         <form class="modal-content" id="setupForm" novalidate>
-            <h2>¡Bienvenido al Juego Binario!</h2>
-            <p>Ingresa tu nombre para comenzar a jugar y entrar en el ranking.</p>
-            <input type="text" id="playerName" placeholder="Tu nombre" maxlength="20" autocomplete="nickname" autofocus>
+            <h2 data-i18n="game.welcome">Et donem la benvinguda al Joc Binari!</h2>
+            <p data-i18n="game.intro">Escriu el teu nom per començar a jugar i entrar al rànquing.</p>
+            <input type="text" id="playerName" placeholder="El teu nom" data-i18n-attr="placeholder:game.namePlaceholder" maxlength="20" autocomplete="nickname" autofocus>
             <div class="error-text" id="nameError"></div>
-            <button type="submit" class="btn btn-primary">Empezar a Jugar</button>
+            <button type="submit" class="btn btn-primary" data-i18n="game.start">Comença a jugar</button>
         </form>
     </div>
 
     <!-- Ranking lateral -->
-    <button class="toggle-ranking" id="toggleRankingBtn" aria-label="Mostrar ranking" hidden>🏆</button>
+    <button class="toggle-ranking" id="toggleRankingBtn" aria-label="Mostra el rànquing" data-i18n-attr="aria-label:game.showRanking" hidden>🏆</button>
     <aside class="ranking-panel" id="rankingPanel" hidden>
-        <h3>🏆 Ranking</h3>
+        <h3 data-i18n="game.ranking">🏆 Rànquing</h3>
         <div id="rankingTable"></div>
     </aside>
 
     <main class="game-container" id="gameContainer" hidden>
         <div class="info-panel">
             <div>
-                <h3>NIVEL</h3>
+                <h3 data-i18n="game.level">NIVELL</h3>
                 <div class="level-value" id="levelValue">1</div>
             </div>
             <div>
-                <h3>PUNTOS</h3>
+                <h3 data-i18n="game.points">PUNTS</h3>
                 <div class="score-value" id="scoreValue">0</div>
             </div>
             <div>
-                <h3>CONVIERTE A BINARIO</h3>
+                <h3 data-i18n="game.target">CONVERTEIX A BINARI</h3>
                 <div class="target-value" id="targetNumber">0</div>
             </div>
             <div>
-                <h3>TIEMPO</h3>
+                <h3 data-i18n="game.time">TEMPS</h3>
                 <div class="timer-value" id="timerValue">180</div>
             </div>
         </div>
@@ -200,36 +206,37 @@
         <div class="binary-display" id="binaryDisplay">0000</div>
 
         <div class="action-buttons">
-            <button class="btn btn-reset" id="resetBtn">Reiniciar</button>
-            <button class="btn btn-check" id="checkBtn">Verificar</button>
-            <button class="btn btn-skip" id="skipBtn">Saltar (-1)</button>
+            <button class="btn btn-reset" id="resetBtn" data-i18n="game.reset">Reinicia</button>
+            <button class="btn btn-check" id="checkBtn" data-i18n="game.check">Verifica</button>
+            <button class="btn btn-skip" id="skipBtn" data-i18n="game.skip">Salta (-1)</button>
         </div>
-        <p class="shortcuts">Atajos: Enter / Espacio = verificar · Esc = saltar</p>
+        <p class="shortcuts" data-i18n="game.shortcuts">Dreceres: Enter / Espai = verificar · Esc = saltar</p>
     </main>
 
     <div class="feedback" id="feedback" aria-live="polite"></div>
 
     <div class="level-up" id="levelUp">
-        <h3>¡NIVEL COMPLETADO!</h3>
-        <p>Nuevo bit desbloqueado</p>
+        <h3 data-i18n="game.levelUp">NIVELL COMPLETAT!</h3>
+        <p data-i18n="game.newBit">Nou bit desbloquejat</p>
     </div>
 
     <!-- Fin de partida -->
     <div class="modal" id="gameOver" hidden>
         <div class="modal-content">
-            <h2>¡Juego Terminado!</h2>
-            <p id="finalScore" style="font-size: 24px;">Puntuación Final: 0 (Nivel 1)</p>
+            <h2 data-i18n="game.over">Fi de la partida!</h2>
+            <p id="finalScore" style="font-size: 24px;"></p>
             <div class="ranking-box">
-                <h3>🏆 Ranking 🏆</h3>
+                <h3 data-i18n="game.rankingBox">🏆 Rànquing 🏆</h3>
                 <div id="endGameRankingTable"></div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-primary" id="newGameBtn">Jugar de Nuevo</button>
-                <button class="btn btn-secondary" id="backToMenuBtn">Cambiar Jugador</button>
+                <button class="btn btn-primary" id="newGameBtn" data-i18n="game.playAgain">Torna a jugar</button>
+                <button class="btn btn-secondary" id="backToMenuBtn" data-i18n="game.changePlayer">Canvia de jugador</button>
             </div>
         </div>
     </div>
 
+    <script src="js/i18n.js"></script>
     <script src="js/bits.js"></script>
     <script src="js/ranking.js"></script>
     <script src="js/game.js"></script>

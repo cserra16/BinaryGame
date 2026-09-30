@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego Binario - Dirección IP</title>
+    <title data-i18n="ip.title">Joc Binari - Adreça IP</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .game-container {
@@ -40,7 +40,7 @@
             color: var(--gold);
         }
 
-        .octet-title span {
+        .octet-title .octet-value {
             color: var(--text);
             font-family: 'Courier New', monospace;
         }
@@ -112,23 +112,27 @@
     </style>
 </head>
 <body>
-    <a class="home-link" href="index.html">← Menú</a>
+    <nav class="topbar">
+        <a class="home-link" href="index.html" data-i18n="nav.menu">← Menú</a>
+        <div class="lang-switch" role="group" aria-label="Idioma / Language">
+            <button type="button" data-lang="ca">CA</button>
+            <button type="button" data-lang="en">EN</button>
+        </div>
+    </nav>
 
     <main class="game-container">
-        <p class="instruction">
-            Toca los círculos para cambiar los bits de cada octeto. Los valores posicionales aparecen cuando el bit está encendido.
-            La dirección IP resultante se muestra abajo.
-        </p>
+        <p class="instruction" data-i18n="ip.instruction">Toca els cercles per canviar els bits de cada octet. Els valors posicionals apareixen quan el bit està encès. L'adreça IP resultant es mostra a sota.</p>
 
         <div class="ip-container" id="ipContainer"></div>
 
         <div class="result-container">
-            <div class="ip-display-label">Dirección IP resultante:</div>
+            <div class="ip-display-label" data-i18n="ip.result">Adreça IP resultant:</div>
             <div class="ip-display" id="ipDisplay">0.0.0.0</div>
             <div class="ip-binary" id="ipBinary">00000000.00000000.00000000.00000000</div>
         </div>
     </main>
 
+    <script src="js/i18n.js"></script>
     <script src="js/bits.js"></script>
     <script>
         const NUM_OCTETS = 4;
@@ -150,8 +154,14 @@
 
             const title = document.createElement('h3');
             title.className = 'octet-title';
-            title.innerHTML = `Octeto ${i + 1}: <span>0</span>`;
-            const titleValue = title.querySelector('span');
+            const titleName = document.createElement('span');
+            const titleValue = document.createElement('span');
+            titleValue.className = 'octet-value';
+            titleValue.textContent = '0';
+            title.append(titleName, ' ', titleValue);
+            const renderTitle = () => { titleName.textContent = I18n.t('ip.octet', { n: i + 1 }); };
+            renderTitle();
+            I18n.onChange(renderTitle);
 
             const bitsDiv = document.createElement('div');
             bitsDiv.className = 'bits-container';

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Juegos para aprender a convertir números decimales a binario y direcciones IP.">
-    <title>Juego Binario</title>
+    <meta name="description" content="Jocs per aprendre a convertir nombres decimals a binari i adreces IP." data-i18n-attr="content:index.description">
+    <title data-i18n="index.title">Joc Binari</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .menu {
@@ -23,7 +23,7 @@
             text-align: center;
         }
 
-        .menu h1 span {
+        .menu h1 .tagline {
             font-family: 'Courier New', monospace;
             display: block;
             font-size: 18px;
@@ -81,26 +81,35 @@
     </style>
 </head>
 <body>
+    <nav class="topbar">
+        <div class="lang-switch" role="group" aria-label="Idioma / Language">
+            <button type="button" data-lang="ca">CA</button>
+            <button type="button" data-lang="en">EN</button>
+        </div>
+    </nav>
+
     <main class="menu">
-        <h1>Juego Binario<span>01001010 01000010</span></h1>
+        <h1><span class="heading" data-i18n="index.heading">Joc Binari</span><span class="tagline" data-i18n="index.tagline">01001010 01000010</span></h1>
 
         <div class="cards">
             <a class="card main" href="game.html">
                 <div class="icon">🎯</div>
-                <h2>Reto contrarreloj</h2>
-                <p>Convierte números decimales a binario antes de que se acabe el tiempo. Sube de nivel y desbloquea bits.</p>
+                <h2 data-i18n="index.game.title">Repte contrarellotge</h2>
+                <p data-i18n="index.game.text">Converteix nombres decimals a binari abans que s'acabi el temps. Puja de nivell i desbloqueja bits.</p>
             </a>
             <a class="card" href="bits.html">
                 <div class="icon">💡</div>
-                <h2>Práctica: 1 byte</h2>
-                <p>Enciende y apaga 8 bits libremente y observa su valor decimal (0 - 255).</p>
+                <h2 data-i18n="index.bits.title">Pràctica: 1 byte</h2>
+                <p data-i18n="index.bits.text">Encén i apaga 8 bits lliurement i observa'n el valor decimal (0 - 255).</p>
             </a>
             <a class="card" href="ip.html">
                 <div class="icon">🌐</div>
-                <h2>Práctica: dirección IP</h2>
-                <p>Construye una dirección IPv4 bit a bit con sus cuatro octetos.</p>
+                <h2 data-i18n="index.ip.title">Pràctica: adreça IP</h2>
+                <p data-i18n="index.ip.text">Construeix una adreça IPv4 bit a bit amb els seus quatre octets.</p>
             </a>
         </div>
     </main>
+
+    <script src="js/i18n.js"></script>
 </body>
 </html>

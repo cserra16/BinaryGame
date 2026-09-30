@@ -32,6 +32,7 @@ let levelUpTimeout = null;
 let feedbackTimeout = null;
 let isGameActive = false;
 let isLevelTransition = false; // durante la animación de nivel no se aceptan respuestas
+let nameErrorShown = false;
 
 const canPlay = () => isGameActive && !isLevelTransition;
 
@@ -77,7 +78,7 @@ async function endGame() {
     isLevelTransition = false;
     levelUp.classList.remove('show');
 
-    $('finalScore').textContent = `Puntuación Final: ${score} (Nivel ${currentLevel})`;
+    renderFinalScore();
     gameOver.hidden = false;
 
     try {
@@ -107,7 +108,7 @@ function checkAnswer() {
 
     if (bitRow.getValue() === currentTarget) {
         score++;
-        showFeedback('¡Correcto! +1', 'correct');
+        showFeedback(I18n.t('game.correct'), 'correct');
         if (score >= currentLevel * POINTS_PER_LEVEL && activeBits < MAX_BITS) {
             advanceToNextLevel();
         } else {
@@ -115,7 +116,7 @@ function checkAnswer() {
         }
     } else {
         score--;
-        showFeedback('Incorrecto -1', 'incorrect');
+        showFeedback(I18n.t('game.incorrect'), 'incorrect');
     }
     updateHud();
 }
@@ -123,7 +124,7 @@ function checkAnswer() {
 function skipQuestion() {
     if (!canPlay()) return;
     score--;
-    showFeedback('Saltado -1', 'incorrect');
+    showFeedback(I18n.t('game.skipped'), 'incorrect');
     nextQuestion();
     updateHud();
 }
@@ -156,6 +157,14 @@ function updateHud() {
     timerValue.textContent = timeLeft;
 }
 
+function renderFinalScore() {
+    $('finalScore').textContent = I18n.t('game.finalScore', { score, level: currentLevel });
+}
+
+function renderNameError() {
+    $('nameError').textContent = nameErrorShown ? I18n.t('game.nameRequired') : '';
+}
+
 function showFeedback(text, type) {
     clearTimeout(feedbackTimeout);
     feedback.textContent = text;
@@ -177,17 +186,25 @@ function showSetup() {
 $('setupForm').addEventListener('submit', event => {
     event.preventDefault();
     const name = $('playerName').value.trim();
-    if (!name) {
-        $('nameError').textContent = 'Por favor, ingresa tu nombre para continuar.';
-        return;
-    }
-    $('nameError').textContent = '';
+    nameErrorShown = !name;
+    renderNameError();
+    if (!name) return;
     currentPlayerName = name;
     playerSetup.hidden = true;
     gameContainer.hidden = false;
     toggleRankingBtn.hidden = false;
     Ranking.render($('rankingTable'), currentPlayerName);
     startGame();
+});
+
+// Al cambiar de idioma se vuelven a pintar los textos generados desde JavaScript
+I18n.onChange(() => {
+    renderNameError();
+    if (!gameOver.hidden) {
+        renderFinalScore();
+        Ranking.render($('endGameRankingTable'), currentPlayerName);
+    }
+    if (!toggleRankingBtn.hidden) Ranking.render($('rankingTable'), currentPlayerName);
 });
 
 toggleRankingBtn.addEventListener('click', () => {

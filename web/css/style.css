@@ -45,19 +45,60 @@ a {
     color: var(--gold);
 }
 
-/* Enlace para volver al menú */
-.home-link {
+/* Barra superior: enllaç al menú i selector d'idioma */
+.topbar {
     position: fixed;
-    top: 20px;
+    top: calc(12px + env(safe-area-inset-top, 0px));
     left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 2100; /* por encima de los modales, para poder cambiar de idioma en cualquier pantalla */
+}
+
+.home-link {
     color: var(--muted);
     text-decoration: none;
     font-size: 14px;
-    z-index: 100;
 }
 
-.home-link:hover {
+.home-link:hover,
+.home-link:focus-visible {
     color: var(--gold);
+}
+
+.lang-switch {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.lang-switch button {
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.lang-switch button:hover {
+    color: var(--text);
+}
+
+.lang-switch button[aria-pressed="true"] {
+    background-color: var(--gold);
+    color: #000;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
 }
 
 .instruction {

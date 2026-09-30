@@ -74,26 +74,26 @@ const Ranking = (() => {
 
     /** Pinta el ranking en `element`, resaltando al jugador `currentName`. */
     async function render(element, currentName) {
-        element.innerHTML = '<p class="ranking-empty">Cargando ranking...</p>';
+        element.innerHTML = `<p class="ranking-empty">${I18n.t('ranking.loading')}</p>`;
         try {
             const ranking = await top();
             if (ranking.length === 0) {
-                element.innerHTML = '<p class="ranking-empty">Aún no hay puntuaciones registradas.</p>';
+                element.innerHTML = `<p class="ranking-empty">${I18n.t('ranking.empty')}</p>`;
                 return;
             }
-            let html = '<table class="ranking-table"><thead><tr><th>#</th><th>Jugador</th><th class="num">Puntos</th></tr></thead><tbody>';
+            let html = `<table class="ranking-table"><thead><tr><th>#</th><th>${I18n.t('ranking.player')}</th><th class="num">${I18n.t('ranking.points')}</th></tr></thead><tbody>`;
             ranking.forEach((player, index) => {
                 const current = player.name === currentName ? ' class="current"' : '';
                 html += `<tr${current}><td>${index + 1}</td><td>${escapeHtml(player.name)}</td><td class="num">${Number(player.best_score)}</td></tr>`;
             });
             html += '</tbody></table>';
             if (!API_URL) {
-                html += '<p class="ranking-note">Ranking guardado en este navegador.</p>';
+                html += `<p class="ranking-note">${I18n.t('ranking.local')}</p>`;
             }
             element.innerHTML = html;
         } catch (error) {
             console.error('Error al cargar el ranking:', error);
-            element.innerHTML = '<p class="ranking-empty" style="color: var(--red)">Error al cargar el ranking.</p>';
+            element.innerHTML = `<p class="ranking-empty" style="color: var(--red)">${I18n.t('ranking.error')}</p>`;
         }
     }
 
